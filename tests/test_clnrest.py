@@ -68,6 +68,7 @@ def test_clnrest_uses_grpc_plugin_certificates(node_factory):
                              r'plugin-clnrest(-rs)?(\.py)?: REST server running at ' + base_url])
     ca_cert = Path(l1.daemon.lightning_dir) / TEST_NETWORK / 'ca.pem'
     assert ca_cert.exists(), f"CA certificate not found at {ca_cert}"
+
     http_session = http_session_with_retry()
     response = http_session.get(base_url + '/v1/list-methods', verify=ca_cert)
     assert response.status_code == 200
