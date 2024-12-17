@@ -29,9 +29,9 @@ jobs:
                 cross build --profile optimized --locked --target x86_64-unknown-linux-gnu
                 cross build --profile optimized --locked --target armv7-unknown-linux-gnueabihf
                 cross build --profile optimized --locked --target aarch64-unknown-linux-gnu
-                tar -czf "${{ github.event.repository.name }}-${{github.ref_name}}-aarch64-linux-gnu.tar.gz" --transform 's|.*/||' "target/aarch64-unknown-linux-gnu/optimized/${{ github.event.repository.name }}"
-                tar -czf "${{ github.event.repository.name }}-${{github.ref_name}}-armv7-linux-gnueabihf.tar.gz" --transform 's|.*/||' "target/armv7-unknown-linux-gnueabihf/optimized/${{ github.event.repository.name }}"
-                tar -czf "${{ github.event.repository.name }}-${{github.ref_name}}-x86_64-linux-gnu.tar.gz" --transform 's|.*/||' "target/x86_64-unknown-linux-gnu/optimized/${{ github.event.repository.name }}"
+                tar -czf "clnrest-rs-${{github.ref_name}}-aarch64-linux-gnu.tar.gz" --transform 's|.*/||' "target/aarch64-unknown-linux-gnu/optimized/clnrest-rs"
+                tar -czf "clnrest-rs-${{github.ref_name}}-armv7-linux-gnueabihf.tar.gz" --transform 's|.*/||' "target/armv7-unknown-linux-gnueabihf/optimized/clnrest-rs"
+                tar -czf "clnrest-rs-${{github.ref_name}}-x86_64-linux-gnu.tar.gz" --transform 's|.*/||' "target/x86_64-unknown-linux-gnu/optimized/clnrest-rs"
                 ls -alh
             - name: Build macos
               id: macos_build
@@ -43,10 +43,10 @@ jobs:
                 export MACOSX_DEPLOYMENT_TARGET=12.0
                 cargo build --profile optimized --locked --target=x86_64-apple-darwin
                 cargo build --profile optimized --locked --target=aarch64-apple-darwin
-                lipo -create -output target/${{ github.event.repository.name }} target/aarch64-apple-darwin/optimized/${{ github.event.repository.name }} target/x86_64-apple-darwin/optimized/${{ github.event.repository.name }}
-                ditto -c -k --sequesterRsrc target/${{ github.event.repository.name }} ${{ github.event.repository.name }}-${{github.ref_name}}-universal-apple-darwin.zip
-                otool -l target/aarch64-apple-darwin/optimized/${{ github.event.repository.name }} | grep -A 5 LC_BUILD_VERSION
-                otool -l target/x86_64-apple-darwin/optimized/${{ github.event.repository.name }} | grep -A 5 LC_BUILD_VERSION
+                lipo -create -output target/clnrest-rs target/aarch64-apple-darwin/optimized/clnrest-rs target/x86_64-apple-darwin/optimized/clnrest-rs
+                ditto -c -k --sequesterRsrc target/clnrest-rs clnrest-rs-${{github.ref_name}}-universal-apple-darwin.zip
+                otool -l target/aarch64-apple-darwin/optimized/clnrest-rs | grep -A 5 LC_BUILD_VERSION
+                otool -l target/x86_64-apple-darwin/optimized/clnrest-rs | grep -A 5 LC_BUILD_VERSION
                 echo "macos_version=$MACOSX_DEPLOYMENT_TARGET" >> "$GITHUB_OUTPUT"
                 echo $(xcodebuild -showsdks)
                 ls -alh
@@ -56,14 +56,14 @@ jobs:
               with:
                 name: unix-binaries
                 path: |
-                    ${{ github.event.repository.name }}-${{github.ref_name}}-*.tar.gz
+                    clnrest-rs-${{github.ref_name}}-*.tar.gz
             - name: Upload macos artifacts
               uses: actions/upload-artifact@v4
               if: contains(matrix.os, 'macos')
               with:
                 name: macos-binaries
                 path: |
-                    ${{ github.event.repository.name }}-${{github.ref_name}}-universal-apple-darwin.zip
+                    clnrest-rs-${{github.ref_name}}-universal-apple-darwin.zip
             - name: Get rust version
               id: rversion
               run: |
@@ -101,4 +101,4 @@ jobs:
                 allowUpdates: false
                 artifactErrorsFailBuild: true
                 body: "${{ steps.changelog_reader.outputs.changes }} \n\n### Release binaries info\n\n- Release binaries were built using rust ${{ needs.build.outputs.rust-version }}\n- Linux release binaries require glibc>=2.31"
-                artifacts: "${{ github.event.repository.name }}-${{github.ref_name}}-*.tar.gz"
+                artifacts: "clnrest-rs-${{github.ref_name}}-*.tar.gz"

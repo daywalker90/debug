@@ -6,7 +6,7 @@ script_dir=$(dirname -- "$(readlink -f -- "$0")")
 cargo_toml_path="$script_dir/../Cargo.toml"
 
 # Use grep and awk to extract the name and version
-name="debug"
+name="$(awk -F'=' '/^\[package\]/ { in_package = 1 } in_package && /name/ { gsub(/[" ]/, "", $2); print $2; exit }' "$cargo_toml_path")"
 version=$(awk -F'=' '/^\[package\]/ { in_package = 1 } in_package && /version/ { gsub(/[" ]/, "", $2); print $2; exit }' "$cargo_toml_path")
 
 clnrest_dir="/usr/local/libexec/c-lightning/plugins/clnrest"
@@ -43,7 +43,7 @@ get_platform_file_end() {
     esac
 }
 platform_file_end=$(get_platform_file_end)
-archive_file=$name-v$version-$platform_file_end
+archive_file=clnrest-rs-v$version-$platform_file_end
 
 github_url="https://github.com/daywalker90/$name/releases/download/v$version/$archive_file"
 
