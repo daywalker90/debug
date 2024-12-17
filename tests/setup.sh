@@ -6,7 +6,7 @@ script_dir=$(dirname -- "$(readlink -f -- "$0")")
 cargo_toml_path="$script_dir/../Cargo.toml"
 
 # Use grep and awk to extract the name and version
-name=$(awk -F'=' '/^\[package\]/ { in_package = 1 } in_package && /name/ { gsub(/[" ]/, "", $2); print $2; exit }' "$cargo_toml_path")
+name="debug"
 version=$(awk -F'=' '/^\[package\]/ { in_package = 1 } in_package && /version/ { gsub(/[" ]/, "", $2); print $2; exit }' "$cargo_toml_path")
 
 clnrest_dir="/usr/local/libexec/c-lightning/plugins/clnrest"
